@@ -52,7 +52,8 @@ function Party:init(def)
 
     self.stateMachine = StateMachine {
         ['idle'] = function() return PartyIdleState(self) end,
-        ['walk'] = function() return PartyWalkState(self) end
+        ['walk'] = function() return PartyWalkState(self) end,
+        ['status'] = function() return PartyStatusState(self) end,
     }
     self.stateMachine:change('idle')
 end

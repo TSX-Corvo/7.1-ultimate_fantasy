@@ -14,7 +14,7 @@ function FadeInState:init(color, time, onFadeComplete)
     self.g = color.g
     self.b = color.b
     self.opacity = 0
-    self.time = time
+    self.time = time / 10
 
     Timer.tween(self.time, {
         [self] = {opacity = 255}

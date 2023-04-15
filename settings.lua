@@ -40,6 +40,7 @@ require 'src/states/entity/CharacterWalkState'
 require 'src/states/entity/PartyBaseState'
 require 'src/states/entity/PartyIdleState'
 require 'src/states/entity/PartyWalkState'
+require 'src/states/entity/PartyStatusState'
 
 -- Game States
 require 'src/states/game/BattleMenuState'
@@ -82,6 +83,7 @@ require 'src/gui/Textbox'
 
 -- Utilities
 require 'src/utilities/quads'
+require 'src/utilities/ordered'
 
 TEXTURES = {
     ['tiles'] = love.graphics.newImage('graphics/sheet.png'),
@@ -149,3 +151,37 @@ SOUNDS = {
     ['exp'] = love.audio.newSource('sounds/exp.wav', 'static'),
     ['the-end'] = love.audio.newSource('sounds/the_end.mp3', 'static')
 }
+
+
+function dump(o)
+    if type(o) == 'table' then
+        local i = 0
+        local s = '{ '
+        for k,v in pairs(o) do
+            if type(k) ~= 'number' then k = '"'..k..'"' end
+            s = s .. '['..k..'] = ' .. dump(v) .. ','
+        end
+        return s .. '} '
+    else
+        return tostring(o)
+    end
+ end
+
+function sdump(o, rec_limit)
+    rec_limit = rec_limit or 0
+    if rec_limit > 3 then
+        return ''
+    end
+
+    if type(o) == 'table' then
+        local i = 0
+        local s = '{ '
+        for k,v in pairs(o) do
+            if type(k) ~= 'number' then k = '"'..k..'"' end
+            s = s .. '['..k..'] = ' .. sdump(v, rec_limit + 1) .. ','
+        end
+        return s .. '} '
+    else
+        return tostring(o)
+    end
+ end

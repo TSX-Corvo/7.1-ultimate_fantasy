@@ -1,3 +1,4 @@
+---@diagnostic disable: redundant-parameter
 --[[
     ISPPJ1 2023
     Study Case: Ultimate Fantasy (RPG)
