@@ -18,72 +18,45 @@ end
 
 function SelectCharacterState:update(dt)
     
-    for i = 1, 4 do
-        table.insert(self.party, i, self.selected)
+    if love.keyboard.wasPressed('right') or love.keyboard.wasPressed('left') then
+        if self.selected == 'male' then
+            self.selected = 'female'
+        else
+            self.selected = 'male'
+        end
+    elseif love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
+        table.insert(self.party, self.character, self.selected)
+        if self.character < NUM_CHARACTERS then
+            stateStack:pop()
+            stateStack:push(SelectCharacterState({
+                character = self.character + 1,
+                selected = self.selected,
+                party = self.party
+            }))
+        else
+            SOUNDS['intro']:stop()
+            stateStack:push(FadeInState({
+                r = 255, g = 255, b = 255
+            }, 1,
+            function()
+                stateStack:pop()
+                stateStack:push(PlayState({
+                    party = self.party
+                }))
+                stateStack:push(DialogueState("" .. 
+                "Welcome to the world of Ultimate Fantasy! There is a curse that has to be broken. "..
+                "To break the curse you have to defeat the Man-eater flower at the west from this town. "..
+                "Go north to gain experience with weak slimes, go south to face second level worms, "..
+                "go east for third level snakes, and finally, go west to deal with strong pumpkins and "..
+                "find the final boss. Good luck!"
+                 ))
+                stateStack:push(FadeOutState({
+                    r = 255, g = 255, b = 255
+                }, 1,
+                function() end))
+            end))
+        end
     end
-
-    SOUNDS['intro']:stop()
-    stateStack:push(FadeInState({
-        r = 255, g = 255, b = 255
-    }, 1,
-    function()
-        stateStack:pop()
-        stateStack:push(PlayState({
-            party = self.party
-        }))
-        -- stateStack:push(DialogueState("" .. 
-        -- "Welcome to the world of Ultimate Fantasy! There is a curse that has to be broken. "..
-        -- "To break the curse you have to defeat the Man-eater flower at the west from this town. "..
-        -- "Go north to gain experience with weak slimes, go south to face second level worms, "..
-        -- "go east for third level snakes, and finally, go west to deal with strong pumpkins and "..
-        -- "find the final boss. Good luck!"
-        --  ))
-        stateStack:push(FadeOutState({
-            r = 255, g = 255, b = 255
-        }, 1,
-        function() end))
-    end))
-
-
-    -- if love.keyboard.wasPressed('right') or love.keyboard.wasPressed('left') then
-    --     if self.selected == 'male' then
-    --         self.selected = 'female'
-    --     else
-    --         self.selected = 'male'
-    --     end
-    -- elseif love.keyboard.wasPressed('enter') or love.keyboard.wasPressed('return') then
-    --     table.insert(self.party, self.character, self.selected)
-    --     if self.character < NUM_CHARACTERS then
-    --         stateStack:pop()
-    --         stateStack:push(SelectCharacterState({
-    --             character = self.character + 1,
-    --             selected = self.selected,
-    --             party = self.party
-    --         }))
-    --     else
-    --         SOUNDS['intro']:stop()
-    --         stateStack:push(FadeInState({
-    --             r = 255, g = 255, b = 255
-    --         }, 1,
-    --         function()
-    --             stateStack:pop()
-    --             stateStack:push(PlayState({
-    --                 party = self.party
-    --             }))
-    --             -- stateStack:push(DialogueState("" .. 
-    --             -- "Welcome to the world of Ultimate Fantasy! There is a curse that has to be broken. "..
-    --             -- "To break the curse you have to defeat the Man-eater flower at the west from this town. "..
-    --             -- "Go north to gain experience with weak slimes, go south to face second level worms, "..
-    --             -- "go east for third level snakes, and finally, go west to deal with strong pumpkins and "..
-    --             -- "find the final boss. Good luck!"
-    --             --  ))
-    --             stateStack:push(FadeOutState({
-    --                 r = 255, g = 255, b = 255
-    --             }, 1,
-    --             function() end))
-    --         end))
-    --     end
-    -- end
 end
 
 function SelectCharacterState:render()
