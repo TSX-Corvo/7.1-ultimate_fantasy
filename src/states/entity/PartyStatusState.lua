@@ -10,9 +10,17 @@
 PartyStatusState = Class{__includes = PartyBaseState}
 
 function PartyStatusState:enter(params)
-    -- print("IN")
-    -- print(sdump(self.party.characters[1]))
-    self.currentSelection = 3
+    self.currentSelection = 1
+end
+
+function PartyStatusState:canAct(i)
+    for key, action in pairs(self.party.characters[i].actions) do
+        if action.target_type == 'character' then
+            return true
+        end        
+    end
+
+    return false
 end
 
 function PartyStatusState:getActions(i)
@@ -59,7 +67,7 @@ function PartyStatusState:update(dt)
         
         SOUNDS['blip']:stop()
         SOUNDS['blip']:play()
-    elseif love.keyboard.wasPressed('return') or love.keyboard.wasPressed('enter') then
+    elseif love.keyboard.wasPressed('return') and self:canAct(self.currentSelection) then
         local it = self:getActions(self.currentSelection)
         stateStack:push(PartySelectActionState(it))
         
