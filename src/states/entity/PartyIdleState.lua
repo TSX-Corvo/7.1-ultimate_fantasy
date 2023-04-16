@@ -26,7 +26,7 @@ function PartyIdleState:update(dt)
         self.party:changeState('walk', {direction = 'up'})
     elseif love.keyboard.isDown('down') then
         self.party:changeState('walk', {direction = 'down'})
-    elseif love.keyboard.wasPressed('return') then
+    elseif love.keyboard.wasPressed('space') then
         self.party:changeState('status')
     end
 end

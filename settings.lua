@@ -41,6 +41,8 @@ require 'src/states/entity/PartyBaseState'
 require 'src/states/entity/PartyIdleState'
 require 'src/states/entity/PartyWalkState'
 require 'src/states/entity/PartyStatusState'
+require 'src/states/entity/PartySelectActionState'
+require 'src/states/entity/PartySelectActionTargetState'
 
 -- Game States
 require 'src/states/game/BattleMenuState'

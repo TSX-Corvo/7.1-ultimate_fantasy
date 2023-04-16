@@ -12,11 +12,62 @@ PartyStatusState = Class{__includes = PartyBaseState}
 function PartyStatusState:enter(params)
     -- print("IN")
     -- print(sdump(self.party.characters[1]))
+    self.currentSelection = 3
+end
+
+function PartyStatusState:getActions(i)
+    local ret = { items = {} }
+
+    for key, action in pairs(self.party.characters[i].actions) do
+        table.insert(ret.items, {
+            text = action.name,
+            onSelect = function ()
+                if action.require_target then
+                    stateStack:push(PartySelectActionTargetState(self.party, function (selected)
+                        SOUNDS[action.sound_effect]:play()
+                        action.func(self.party.characters[i], selected, action.strength)
+                    end))
+                else
+                    SOUNDS[action.sound_effect]:play()
+                    action.func(self.party.characters[i], self.party.characters, action.strength)
+                    stateStack:pop()
+                end
+            end
+        })
+    end
+
+    return ret
 end
 
 function PartyStatusState:update(dt)
-    
-    if love.keyboard.wasPressed('return') then
+
+    if love.keyboard.wasPressed('left') then
+        if self.currentSelection == 1 then
+            self.currentSelection = #self.party.characters
+        else
+            self.currentSelection = self.currentSelection - 1
+        end
+        
+        SOUNDS['blip']:stop()
+        SOUNDS['blip']:play()
+    elseif love.keyboard.wasPressed('right') then
+        if self.currentSelection == #self.party.characters then
+            self.currentSelection = 1
+        else
+            self.currentSelection = self.currentSelection + 1
+        end
+        
+        SOUNDS['blip']:stop()
+        SOUNDS['blip']:play()
+    elseif love.keyboard.wasPressed('return') or love.keyboard.wasPressed('enter') then
+        local it = self:getActions(self.currentSelection)
+        stateStack:push(PartySelectActionState(it))
+        
+        SOUNDS['blip']:stop()
+        SOUNDS['blip']:play()
+    end
+
+    if love.keyboard.wasPressed('space') then
         self.party:changeState('idle')
     end
 end
@@ -37,6 +88,8 @@ function PartyStatusState:render()
     love.graphics.rectangle("fill", x - width / 2, y - height / 2, width, height)
     love.graphics.setColor(love.math.colorFromBytes(255, 255, 255, 255))
 
+    love.graphics.setFont(FONTS['small'])
+
     local drawOffset = 16
     for k, c in pairs(self.party.characters) do
         if not c.dead then
@@ -44,6 +97,11 @@ function PartyStatusState:render()
             -- draw sprite
             love.graphics.draw(TEXTURES[c.texture],
                 FRAMES[c.texture][8], x - width/2 + drawOffset + ENTITY_WIDTH/2, y - height/2 + 20)
+
+            if k == self.currentSelection then
+                love.graphics.draw(TEXTURES['cursor-right'],
+                    x - width/2 + drawOffset - ENTITY_WIDTH/2, y - height/2 + 20)
+            end
 
             -- name
             love.graphics.printf(c.name, x - width/2 + drawOffset, y - height/2 + 60, 40)
@@ -87,7 +145,11 @@ function PartyStatusState:render()
             vOffset = vOffset + 10
 
             for key, action in pairs(c.actions) do
-                love.graphics.setColor(love.math.colorFromBytes(255, 255, 255, 127))
+                if action.target_type == 'character' then
+                        love.graphics.setColor(love.math.colorFromBytes(255, 255, 255, 255))
+                    else
+                        love.graphics.setColor(love.math.colorFromBytes(255, 255, 255, 127))
+                end
                 love.graphics.printf(
                     action.name,
                     x - width/2 + drawOffset,
@@ -99,10 +161,12 @@ function PartyStatusState:render()
                 vOffset = vOffset + 10
             end
 
-            
-                
+
+
             drawOffset = drawOffset + width/#self.party.characters
         end
+
+     
     end
 
     -- love.graphics.printf(sdump(self.party.characters[1]), 0, 0, 500)
